@@ -1,6 +1,4 @@
-# Getting Started with Create React App
-
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Broccoli & Co.
 
 ## Available Scripts
 
@@ -19,7 +17,7 @@ You may also see any lint errors in the console.
 Launches the test runner in the interactive watch mode.\
 See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-### To do list
+## To do list
 - Modularize the application, e.g. Input, Form, Popup, Header, Body, Footer
 - Write more unit tests for every component
 - Click outside the popup to dismiss
