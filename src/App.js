@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import axios from 'axios';
 import './App.css';
+import Input from './components/Input/Input';
+import Modal from './components/Modal/Modal';
 
 function App() {
 
@@ -28,6 +30,8 @@ function App() {
   function dismissInvitationPopup() {
     setIsInvitationPopupOpen(false);
     setRequestInfo(defaultRequestInfo);
+    setErrorMessage('');
+    setIsLoading(false);
   }
 
   function dismissRequestSentPopup() {
@@ -105,6 +109,7 @@ function App() {
     })
     .then((response) => {
       console.log(response.data);
+      setErrorMessage('');
       setIsLoading(false);
       setIsInvitationPopupOpen(false);
       setIsRequestSentPopupOpen(true);
@@ -118,6 +123,27 @@ function App() {
       setIsLoading(false);
     });
   }
+
+  const nameValidationHtml = (
+    <div>
+      {!requestInfo.nameFilled ? <div className="required-error">Required</div> : ''}
+      {!requestInfo.nameValid ? <div className="required-error">At least 3 characters</div> : ''}
+    </div>
+  );
+
+  const emailValidationHtml = (
+    <div>
+      {!requestInfo.emailFilled ? <div className="required-error">Required</div> : ''}
+      {!requestInfo.emailValid ? <div className="required-error">Email not valid</div> : ''}
+    </div>
+  );
+
+  const confirmEmailValidationHtml = (
+    <div>
+      {!requestInfo.confirmEmailFilled ? <div className="required-error">Required</div> : ''}
+      {!requestInfo.emailMatch ? <div className="required-error">Email not match</div> : ''}
+    </div>
+  );
 
   return (
     <div className="app">
@@ -141,44 +167,50 @@ function App() {
           © 2016 Broccoli & Co. All rights reserved.
         </p>
       </footer>
-      <div className={`popup-wrapper fade-in-down ${isInvitationPopupOpen ? 'show' : 'hide'}`}>
-        <div className="popup">
-          <div className="popup-content">
-            <h2 className="popup-title">Request an invite</h2>
-            <button className="close-button" onClick={dismissInvitationPopup}>X</button>
-            <form>
-              <div className="form-control">
-                <input className={`input ${!requestInfo.nameFilled || !requestInfo.nameValid ? 'error' : ''}`} type="text" placeholder="Full name" value={requestInfo.name} onChange={(e) => requestInfoOnChange('name', e.target.value)} />
-                {!requestInfo.nameFilled ? <div className="required-error">Required</div> : ''}
-                {!requestInfo.nameValid ? <div className="required-error">At least 3 characters</div> : ''}
-              </div>
-              <div className="form-control">
-                <input className={`input ${!requestInfo.emailFilled || !requestInfo.emailValid ? 'error' : ''}`} type="text" placeholder="Email" value={requestInfo.email} onChange={(e) => requestInfoOnChange('email', e.target.value)} />
-                {!requestInfo.emailFilled ? <div className="required-error">Required</div> : ''}
-                {!requestInfo.emailValid ? <div className="required-error">Email not valid</div> : ''}
-              </div>
-              <div className="form-control">
-                <input className={`input ${!requestInfo.confirmEmailFilled || !requestInfo.emailMatch ? 'error' : ''}`} type="text" placeholder="Confirm email" value={requestInfo.confirmEmail} onChange={(e) => requestInfoOnChange('confirmEmail', e.target.value)} />
-                {!requestInfo.confirmEmailFilled ? <div className="required-error">Required</div> : ''}
-                {!requestInfo.emailMatch ? <div className="required-error">Email not match</div> : ''}
-              </div>
-              <button type="submit" className="ok-button" onClick={(e) => validateAndSendRequest(e)} disabled={isLoading}>{isLoading ? `Sending, please wait...` : `Send`}</button>
-              <div className="error-message">{errorMessage}</div>
-            </form>
-          </div>
-        </div>
-        <div className='popup-backdrop'></div>
-      </div>
-      <div className={`popup-wrapper fade-in-down ${isRequestSentPopupOpen ? 'show' : 'hide'}`}>
-        <div className="popup">
-          <div className="popup-content">
-            <h2 className="popup-title">All done!</h2>
-            <p>You will be one of the first to experience Broccoli & Co. when we launch.</p>
-            <button className="ok-button" onClick={dismissRequestSentPopup}>OK</button>
-          </div>
-        </div>
-        <div className='popup-backdrop'></div>
-      </div>
+      <Modal
+        isOpen={isInvitationPopupOpen}
+      >
+        <h2 className="popup-title">Request an invite</h2>
+        <button className="close-button" onClick={dismissInvitationPopup}>X</button>
+        <form>
+          <Input
+            id="name"
+            className={`input ${!requestInfo.nameFilled || !requestInfo.nameValid ? 'error' : ''}`}
+            type="text"
+            placeholder="Full name"
+            value={requestInfo.name}
+            onChange={(e) => requestInfoOnChange('name', e.target.value)}
+            validationHtml={nameValidationHtml}
+          />
+          <Input
+            id="email"
+            className={`input ${!requestInfo.emailFilled || !requestInfo.emailValid ? 'error' : ''}`}
+            type="text"
+            placeholder="Email"
+            value={requestInfo.email}
+            onChange={(e) => requestInfoOnChange('email', e.target.value)}
+            validationHtml={emailValidationHtml}
+          />
+          <Input
+            id="confirmEmail"
+            className={`input ${!requestInfo.confirmEmailFilled || !requestInfo.emailMatch ? 'error' : ''}`}
+            type="text"
+            placeholder="Confirm email"
+            value={requestInfo.confirmEmail}
+            onChange={(e) => requestInfoOnChange('confirmEmail', e.target.value)}
+            validationHtml={confirmEmailValidationHtml}
+          />
+          <button type="submit" className="ok-button" onClick={(e) => validateAndSendRequest(e)} disabled={isLoading}>{isLoading ? `Sending, please wait...` : `Send`}</button>
+          <div className="error-message">{errorMessage}</div>
+        </form>
+      </Modal>
+      <Modal
+        isOpen={isRequestSentPopupOpen}
+      >
+        <h2 className="popup-title">All done!</h2>
+        <p>You will be one of the first to experience Broccoli & Co. when we launch.</p>
+        <button className="ok-button" onClick={dismissRequestSentPopup}>OK</button>
+      </Modal>
     </div>
   );
 }
